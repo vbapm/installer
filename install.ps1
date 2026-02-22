@@ -7,10 +7,10 @@ if ($args.Length -gt 0) {
   $Version = $args.Get(0)
 }
 
-$LibDir = "$env:APPDATA\vba-blocks"
+$LibDir = "$env:APPDATA\vbapm"
 $BinDir ="$LibDir\bin"
 $Exe = "$BinDir\vba"
-$ZipFile = "$LibDir\vba-blocks.zip"
+$ZipFile = "$LibDir\vbapm.zip"
 $AddinsDir = "$LibDir\addins\build"
 
 # GitHub requires TLS 1.2
@@ -38,15 +38,15 @@ if (!(Test-Path $LibDir)) {
   New-Item $LibDir -ItemType Directory | Out-Null
 }
 
-Write-Output "[1/5] Downloading vba-blocks..."
+Write-Output "[1/5] Downloading vbapm..."
 Write-Output "($ReleaseUri)"
 Invoke-WebRequest $ReleaseUri -Out $ZipFile
 
-Write-Output "[2/5] Extracting vba-blocks..."
+Write-Output "[2/5] Extracting vbapm..."
 Expand-Archive $ZipFile -Destination $LibDir -Force
 Remove-Item $ZipFile
 
-Write-Output "[3/5] Adding vba-blocks to PATH..."
+Write-Output "[3/5] Adding vbapm to PATH..."
 $User = [EnvironmentVariableTarget]::User
 $Path = [Environment]::GetEnvironmentVariable('Path', $User)
 if (!(";$Path;".ToLower() -like "*;$BinDir;*".ToLower())) {
@@ -66,7 +66,7 @@ function New-Shortcut ($Src, $Dest) {
 }
 
 Write-Output "[4/5] Creating shortcut to add-ins..."
-New-Shortcut "$AddinsDir" "$env:AppData\Microsoft\Addins\vba-blocks Add-ins.lnk"
+New-Shortcut "$AddinsDir" "$env:AppData\Microsoft\Addins\vbapm Add-ins.lnk"
 
 function Enable-VBOM ($App) {
   Try {
@@ -86,7 +86,7 @@ Enable-VBOM "Excel"
 # TODO Enable-VBOM "Access"
 
 Write-Output ""
-Write-Output "Success! vba-blocks was installed successfully."
+Write-Output "Success! vbapm was installed successfully."
 Write-Output ""
 Write-Output "Command: \"$Exe\""
 Write-Output "Add-ins: \"$AddinsDir\""

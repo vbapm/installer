@@ -1,4 +1,4 @@
-# vba-blocks Installer
+# vbapm Installer
 
 ## Install Latest Version
 
@@ -18,7 +18,7 @@ In terminal, run the following:
 $ curl -fsSL https://vba-blocks.com/install.sh | sh
 ```
 
-For more recent versions of Office for Mac, you will need to trust access to the VBA project object model for vba-blocks to work correctly:
+For more recent versions of Office for Mac, you will need to trust access to the VBA project object model for vbapm to work correctly:
 
 <details>
   <summary>Trust access to the VBA project object model</summary>

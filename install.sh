@@ -5,12 +5,12 @@
 
 set -e
 
-lib_dir="$HOME/Library/Application Support/vba-blocks"
+lib_dir="$HOME/Library/Application Support/vbapm"
 bin_dir="$lib_dir/bin"
 exe="$bin_dir/vba"
 addins_dir="$lib_dir/addins/build"
-addins_link="$HOME/vba-blocks Add-ins"
-zip_file="$lib_dir/vba-blocks-mac.tar.gz"
+addins_link="$HOME/vbapm Add-ins"
+zip_file="$lib_dir/vbapm-mac.tar.gz"
 export_bin="export PATH=\"\$PATH:$bin_dir\""
 zprofile="$HOME/.zprofile"
 profile="$HOME/.profile"
@@ -34,17 +34,17 @@ if [ ! -d "$lib_dir" ]; then
 	mkdir -p "$lib_dir"
 fi
 
-echo "[1/4] Downloading vba-blocks..."
+echo "[1/4] Downloading vbapm..."
 curl -fL# -o "$zip_file" "$release_uri"
 
-echo "[2/4] Extracting vba-blocks..."
+echo "[2/4] Extracting vbapm..."
 tar -xzf "$zip_file" --directory "$lib_dir"
-chmod +x "$bin_dir/vba-blocks"
+chmod +x "$bin_dir/vbapm"
 chmod +x "$bin_dir/vba"
 chmod +x "$lib_dir/vendor/node"
 
 # Add bin to .zprofile / .profile / .bash_profile
-echo "[3/4] Adding vba-blocks to PATH"
+echo "[3/4] Adding vbapm to PATH"
 if [ -a $zprofile ] && ! grep -q "$bin_dir" $zprofile; then
   echo $export_bin >> "$zprofile"
 fi
@@ -60,7 +60,7 @@ echo "[4/4] Creating link to add-ins at \"$addins_link\"..."
 ln -sf "$addins_dir" "$addins_link"
 
 echo ""
-echo "\033[32mSuccess!\033[m vba-blocks was installed successfully."
+echo "\033[32mSuccess!\033[m vbapm was installed successfully."
 echo ""
 echo "Command: \"$exe\""
 echo "Add-ins: \"$addins_link\""
@@ -73,7 +73,7 @@ if (( existing_install == 0 )); then
 	echo ""
 	echo "For more recent versions of Office for Mac, you will need to"
 	echo "trust access to the VBA project object model"
-	echo "for vba-blocks to work correctly."
+	echo "for vbapm to work correctly."
 	echo ""
 	echo "1. Open Excel"
 	echo "2. Click \"Excel\" in the menu bar"
