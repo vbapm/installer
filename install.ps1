@@ -17,21 +17,16 @@ $AddinsDir = "$LibDir\addins\build"
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 $ReleaseUri = if (!$Version) {
-  $Response = Invoke-WebRequest "https://github.com/vba-blocks/vba-blocks/releases"
-
-  $HTMLFile = New-Object -Com HTMLFile
-  if ($HTMLFile.IHTMLDocument2_write) {
-    $HTMLFile.IHTMLDocument2_write($Response.Content)
-  } else {
-    $ResponseBytes = [Text.Encoding]::Unicode.GetBytes($Response.Content)
-    $HTMLFile.write($ResponseBytes)
-  }
-  $HTMLFile.getElementsByTagName('a') |
-    Where-Object { $_.href -like "about:/vba-blocks/vba-blocks/releases/download/*/vba-blocks-win.zip" } |
-    ForEach-Object { $_.href -replace 'about:', 'https://github.com' } |
+  # Use the GitHub API to find the latest release asset URL.
+  # The releases HTML page requires JavaScript to render asset links,
+  # so we query the API which returns JSON instead.
+  $Response = Invoke-RestMethod "https://api.github.com/repos/vbapm/core/releases/latest"
+  $Response.assets |
+    Where-Object { $_.name -eq "vbapm-win.zip" } |
+    ForEach-Object { $_.browser_download_url } |
     Select-Object -First 1
 } else {
-  "https://github.com/vba-blocks/vba-blocks/releases/download/$Version/vba-blocks-win.zip"
+  "https://github.com/vbapm/core/releases/download/$Version/vbapm-win.zip"
 }
 
 if (!(Test-Path $LibDir)) {

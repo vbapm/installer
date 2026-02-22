@@ -46,6 +46,10 @@ __Mac__
 $ curl -fsSL https://vba-blocks.com/install.sh | sh -s v0.2.0
 ```
 
+## Notes
+
+The installer scripts use the [GitHub REST API](https://docs.github.com/en/rest/releases/releases#get-the-latest-release) to discover the latest release download URL. This avoids relying on scraping the GitHub releases HTML page, which requires JavaScript to render asset links.
+
 ## Known Issues
 
 <details>

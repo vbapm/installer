@@ -20,13 +20,16 @@ bash_profile="$HOME/.bash_profile"
 existing_install=$?
 
 if [ $# -eq 0 ]; then
-	release_path=$(curl -sSf https://github.com/vba-blocks/vba-blocks/releases |
-		grep -o "/vba-blocks/vba-blocks/releases/download/.*/vba-blocks-mac\\.tar\\.gz" |
-		head -n 1)
-	if [ ! "$release_path" ]; then exit 1; fi
-	release_uri="https://github.com${release_path}"
+	# Use the GitHub API to find the latest release asset URL.
+	# The releases HTML page requires JavaScript to render asset links,
+	# so we query the API which returns JSON instead.
+	release_uri=$(curl -sSf https://api.github.com/repos/vbapm/core/releases/latest |
+		grep -o '"browser_download_url": *"[^"]*vbapm-mac\.tar\.gz"' |
+		head -n 1 |
+		sed 's/.*"browser_download_url": *"\([^"]*\)"/\1/')
+	if [ ! "$release_uri" ]; then echo "Error: Could not find release download URL."; exit 1; fi
 else
-	release_uri="https://github.com/vba-blocks/vba-blocks/releases/download/${1}/vba-blocks-mac.tar.gz"
+	release_uri="https://github.com/vbapm/core/releases/download/${1}/vbapm-mac.tar.gz"
 fi
 
 if [ ! -d "$lib_dir" ]; then
