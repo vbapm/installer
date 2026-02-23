@@ -6,16 +6,16 @@ __Windows__
 
 In powershell, run the following:
 
-```shellsession
-> iwr https://vba-blocks.com/install.ps1 | iex
+```pwsh
+iwr https://raw.githubusercontent.com/vbapm/installer/refs/heads/main/install.ps1 | iex
 ```
 
 __Mac__
 
 In terminal, run the following:
 
-```shellsession
-$ curl -fsSL https://vba-blocks.com/install.sh | sh
+```shell
+curl -fsSL https://raw.githubusercontent.com/vbapm/installer/refs/heads/main/install.sh | sh
 ```
 
 For more recent versions of Office for Mac, you will need to trust access to the VBA project object model for vbapm to work correctly:
@@ -36,14 +36,14 @@ For more recent versions of Office for Mac, you will need to trust access to the
 
 __Windows__
 
-```shellsession
-> iwr https://vba-blocks.com/install.ps1 -out install.ps1; .\install.ps1 v0.2.0
+```pwsh
+iwr https://raw.githubusercontent.com/vbapm/installer/refs/heads/main/install.ps1 -out install.ps1; .\install.ps1 v0.2.0
 ```
 
 __Mac__
 
-```shellsession
-$ curl -fsSL https://vba-blocks.com/install.sh | sh -s v0.2.0
+```shell
+curl -fsSL https://raw.githubusercontent.com/vbapm/installer/refs/heads/main/install.sh | sh -s v0.2.0
 ```
 
 ## Notes
