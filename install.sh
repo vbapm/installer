@@ -43,6 +43,9 @@ curl -fL# -o "$zip_file" "$release_uri"
 
 echo "[2/4] Extracting vbapm..."
 tar -xzf "$zip_file" --directory "$lib_dir"
+# Strip Windows CRLF line endings from shell scripts in case the release was built on Windows
+sed -i '' 's/\r//' "$bin_dir/vbapm"
+sed -i '' 's/\r//' "$bin_dir/vba"
 chmod +x "$bin_dir/vbapm"
 chmod +x "$bin_dir/vba"
 chmod +x "$lib_dir/vendor/node"
