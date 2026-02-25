@@ -32,15 +32,18 @@ jobs:
           }
           Write-Output "OK: $BinDir is in user PATH."
 
-      - name: Check add-ins shortcut exists
-        shell: pwsh
-        run: |
-          $Shortcut = "$env:AppData\Microsoft\Addins\vbapm Add-ins.lnk"
-          if (!(Test-Path $Shortcut)) {
-            Write-Error "FAIL: Shortcut not found at $Shortcut"
-            exit 1
-          }
-          Write-Output "OK: Shortcut exists at $Shortcut."
+      # TODO: add setup-vba in order to make sure Office is installed. Otherwise the addin directory won't exist and the install script will skip the addin shortcut creation step:
+      #  and give the following warning: "Failed to link add-ins, they can instead be found in C:\Users\runneradmin\AppData\Roaming\vbapm\addins\build."
+      
+      # - name: Check add-ins shortcut exists
+      #   shell: pwsh
+      #   run: |
+      #     $Shortcut = "$env:AppData\Microsoft\Addins\vbapm Add-ins.lnk"
+      #     if (!(Test-Path $Shortcut)) {
+      #       Write-Error "FAIL: Shortcut not found at $Shortcut"
+      #       exit 1
+      #     }
+      #     Write-Output "OK: Shortcut exists at $Shortcut."
 
       - name: Check vba --help works
         shell: pwsh
