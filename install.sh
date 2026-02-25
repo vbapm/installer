@@ -18,8 +18,7 @@ zprofile="$HOME/.zprofile"
 profile="$HOME/.profile"
 bash_profile="$HOME/.bash_profile"
 
-[ -d "$lib_dir" ]
-existing_install=$?
+if [ -d "$lib_dir" ]; then existing_install=0; else existing_install=1; fi
 
 if [ $# -eq 0 ]; then
 	# Use the GitHub API to find the latest release asset URL.
