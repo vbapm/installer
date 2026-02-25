@@ -1,6 +1,8 @@
 # Based heavily on the approach used in https://github.com/denoland/deno_install
 # Copyright 2018 the Deno authors. All rights reserved. MIT license.
 
+# Installer for vbapm on Windows
+
 $ErrorActionPreference = 'Stop'
 
 if ($args.Length -gt 0) {
@@ -60,6 +62,7 @@ function New-Shortcut ($Src, $Dest) {
   }
 }
 
+# The add-ins directory is where the browse button used to add a new addin will start from, so we create a shortcut to it on the desktop for easy access.
 Write-Output "[4/5] Creating shortcut to add-ins..."
 New-Shortcut "$AddinsDir" "$env:AppData\Microsoft\Addins\vbapm Add-ins.lnk"
 

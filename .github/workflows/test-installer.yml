@@ -1,0 +1,146 @@
+name: Test Installer
+
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+  pull_request:
+
+jobs:
+  test-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install vbapm
+        shell: pwsh
+        run: |
+          ./install.ps1
+          "$env:APPDATA\vbapm\bin" >> $env:GITHUB_PATH
+
+      - name: Check PATH contains vbapm bin
+        shell: pwsh
+        run: |
+          $BinDir = "$env:APPDATA\vbapm\bin"
+          $UserPath = [Environment]::GetEnvironmentVariable('Path', [EnvironmentVariableTarget]::User)
+          if (($UserPath -split ';') -notcontains $BinDir) {
+            Write-Error "FAIL: $BinDir not found in user PATH. Current user PATH: $UserPath"
+            exit 1
+          }
+          Write-Output "OK: $BinDir is in user PATH."
+
+      - name: Check add-ins shortcut exists
+        shell: pwsh
+        run: |
+          $Shortcut = "$env:AppData\Microsoft\Addins\vbapm Add-ins.lnk"
+          if (!(Test-Path $Shortcut)) {
+            Write-Error "FAIL: Shortcut not found at $Shortcut"
+            exit 1
+          }
+          Write-Output "OK: Shortcut exists at $Shortcut."
+
+      - name: Check vba --help works
+        shell: pwsh
+        run: |
+          $exe = "$env:APPDATA\vbapm\bin\vba"
+          & $exe --help
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "FAIL: 'vba --help' exited with code $LASTEXITCODE"
+            exit 1
+          }
+          Write-Output "OK: 'vba --help' succeeded."
+
+      - name: Uninstall vbapm
+        shell: pwsh
+        run: ./uninstall.ps1
+
+      - name: Check PATH no longer contains vbapm bin
+        shell: pwsh
+        run: |
+          $BinDir = "$env:APPDATA\vbapm\bin"
+          $UserPath = [Environment]::GetEnvironmentVariable('Path', [EnvironmentVariableTarget]::User)
+          if (($UserPath -split ';') -contains $BinDir) {
+            Write-Error "FAIL: $BinDir is still in user PATH after uninstall."
+            exit 1
+          }
+          Write-Output "OK: $BinDir is no longer in user PATH."
+
+      - name: Check vba executable no longer exists
+        shell: pwsh
+        run: |
+          $exe = "$env:APPDATA\vbapm\bin\vba"
+          if (Test-Path $exe) {
+            Write-Error "FAIL: vba executable still exists at $exe after uninstall."
+            exit 1
+          }
+          Write-Output "OK: vba executable has been removed."
+
+  test-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install vbapm
+        run: |
+          chmod +x ./install.sh
+          ./install.sh
+          echo "$HOME/Library/Application Support/vbapm/bin" >> "$GITHUB_PATH"
+
+      - name: Check PATH entry was written to shell profiles
+        run: |
+          bin_dir="$HOME/Library/Application Support/vbapm/bin"
+          found=0
+          for rc_file in "$HOME/.zprofile" "$HOME/.profile" "$HOME/.bash_profile"; do
+            if [ -f "$rc_file" ] && grep -qF "$bin_dir" "$rc_file"; then
+              echo "OK: PATH entry found in $rc_file."
+              found=1
+            fi
+          done
+          if [ $found -eq 0 ]; then
+            echo "FAIL: PATH entry not found in any shell profile."
+            exit 1
+          fi
+
+      - name: Check add-ins symlink exists
+        run: |
+          addins_link="$HOME/vbapm Add-ins"
+          if [ ! -L "$addins_link" ]; then
+            echo "FAIL: Symlink not found at \"$addins_link\""
+            exit 1
+          fi
+          echo "OK: Symlink exists at \"$addins_link\"."
+
+      - name: Check vba --help works
+        run: |
+          exe="$HOME/Library/Application Support/vbapm/bin/vba"
+          "$exe" --help
+          echo "OK: 'vba --help' succeeded."
+
+      - name: Uninstall vbapm
+        run: |
+          chmod +x ./uninstall.sh
+          ./uninstall.sh
+
+      - name: Check PATH entry removed from shell profiles
+        run: |
+          bin_dir="$HOME/Library/Application Support/vbapm/bin"
+          for rc_file in "$HOME/.zprofile" "$HOME/.profile" "$HOME/.bash_profile"; do
+            if [ -f "$rc_file" ] && grep -qF "$bin_dir" "$rc_file"; then
+              echo "FAIL: PATH entry still present in $rc_file after uninstall."
+              exit 1
+            fi
+          done
+          echo "OK: PATH entry removed from all shell profiles."
+
+      - name: Check vba executable no longer exists
+        run: |
+          exe="$HOME/Library/Application Support/vbapm/bin/vba"
+          if [ -f "$exe" ]; then
+            echo "FAIL: vba executable still exists at \"$exe\" after uninstall."
+            exit 1
+          fi
+          echo "OK: vba executable has been removed."

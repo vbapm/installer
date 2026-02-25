@@ -3,6 +3,8 @@
 # Based heavily on the approach used in https://github.com/denoland/deno_install
 # Copyright 2018 the Deno authors. All rights reserved. MIT license.
 
+# Installer for vbapm on macOS
+
 set -e
 
 lib_dir="$HOME/Library/Application Support/vbapm"
