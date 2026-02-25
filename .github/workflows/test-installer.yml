@@ -13,7 +13,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install vbapm
         shell: pwsh
@@ -34,7 +34,7 @@ jobs:
 
       # TODO: add setup-vba in order to make sure Office is installed. Otherwise the addin directory won't exist and the install script will skip the addin shortcut creation step:
       #  and give the following warning: "Failed to link add-ins, they can instead be found in C:\Users\runneradmin\AppData\Roaming\vbapm\addins\build."
-      
+
       # - name: Check add-ins shortcut exists
       #   shell: pwsh
       #   run: |
@@ -85,7 +85,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install vbapm
         run: |
