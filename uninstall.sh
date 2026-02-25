@@ -18,7 +18,7 @@ for rc_file in "$zprofile" "$profile" "$bash_profile"; do
   if [ -f "$rc_file" ] && grep -qF "$bin_dir" "$rc_file"; then
     # Use a temp file to avoid in-place issues on macOS (no sed -i without extension)
     tmp=$(mktemp)
-    grep -vF "$export_bin" "$rc_file" > "$tmp"
+    grep -vF "$export_bin" "$rc_file" > "$tmp" || true
     mv "$tmp" "$rc_file"
     echo "Removed PATH entry from $rc_file."
   fi
