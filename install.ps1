@@ -13,6 +13,45 @@ $LibDir = "$env:APPDATA\vbapm"
 $BinDir ="$LibDir\bin"
 $ZipFile = "$LibDir\vbapm.zip"
 $AddinsDir = "$LibDir\addins\build"
+$AddinPath = Join-Path $AddinsDir "vbapm.xlam"
+
+function Get-ComActiveObject ($ProgId) {
+  return [Microsoft.VisualBasic.Interaction]::GetObject($null, $ProgId)
+}
+
+function Close-VbapmAddin {
+  try {
+    $Excel = Get-ComActiveObject "Excel.Application"
+  } catch {
+    return
+  }
+
+  try {
+    $NormalizedAddinPath = [System.IO.Path]::GetFullPath($AddinPath)
+
+    foreach ($Workbook in $Excel.Workbooks) {
+      try {
+        $MatchesPath = [System.IO.Path]::GetFullPath($Workbook.FullName) -eq $NormalizedAddinPath
+        if ($MatchesPath -or $Workbook.Name -ieq "vbapm.xlam") {
+          Write-Output "Closing open vbapm.xlam..."
+          $Workbook.Close($false)
+        }
+      } catch {
+        # The add-in may only be exposed through the AddIns collection.
+      }
+    }
+
+    foreach ($Addin in $Excel.AddIns) {
+      if ($Addin.Name -ieq "vbapm" -or $Addin.Name -ieq "vbapm.xlam") {
+        $Addin.Installed = $false
+      }
+    }
+  } finally {
+    [System.Runtime.InteropServices.Marshal]::ReleaseComObject($Excel) | Out-Null
+  }
+}
+
+Close-VbapmAddin
 
 # Create the lib directory if it doesn't exist
 if (!(Test-Path $LibDir)) {
