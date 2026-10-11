@@ -15,13 +15,9 @@ $ZipFile = "$LibDir\vbapm.zip"
 $AddinsDir = "$LibDir\addins\build"
 $AddinPath = Join-Path $AddinsDir "vbapm.xlam"
 
-function Get-ComActiveObject ($ProgId) {
-  return [Microsoft.VisualBasic.Interaction]::GetObject($null, $ProgId)
-}
-
 function Close-VbapmAddin {
   try {
-    $Excel = Get-ComActiveObject "Excel.Application"
+    $Excel = [System.Runtime.InteropServices.Marshal]::GetActiveObject("Excel.Application")
   } catch {
     return
   }
@@ -29,9 +25,9 @@ function Close-VbapmAddin {
   try {
     $NormalizedAddinPath = [System.IO.Path]::GetFullPath($AddinPath)
 
-    foreach ($Workbook in $Excel.Workbooks) {
+    foreach ($Workbook in @($Excel.Workbooks)) {
       try {
-        $MatchesPath = [System.IO.Path]::GetFullPath($Workbook.FullName) -eq $NormalizedAddinPath
+        $MatchesPath = $Workbook.FullName -and ([System.IO.Path]::GetFullPath($Workbook.FullName) -eq $NormalizedAddinPath)
         if ($MatchesPath -or $Workbook.Name -ieq "vbapm.xlam") {
           Write-Output "Closing open vbapm.xlam..."
           $Workbook.Close($false)
@@ -41,7 +37,7 @@ function Close-VbapmAddin {
       }
     }
 
-    foreach ($Addin in $Excel.AddIns) {
+    foreach ($Addin in @($Excel.AddIns)) {
       if ($Addin.Name -ieq "vbapm" -or $Addin.Name -ieq "vbapm.xlam") {
         $Addin.Installed = $false
       }
@@ -71,7 +67,12 @@ foreach ($Source in $Sources) {
 	}
 
 	if (Test-Path $DestPath) {
-		Remove-Item $DestPath -Recurse -Force
+		try {
+			Remove-Item $DestPath -Recurse -Force
+		} catch {
+			Write-Error "Could not remove $DestPath. An Excel instance (possibly hidden) may still have vbapm.xlam open. Close all Excel windows and any leftover Excel processes, then re-run the installer."
+			exit 1
+		}
 	}
 
 	Copy-Item $SourcePath $DestPath -Recurse -Force
