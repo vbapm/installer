@@ -24,6 +24,19 @@ function Close-VbapmAddin {
 
   try {
     $NormalizedAddinPath = [System.IO.Path]::GetFullPath($AddinPath)
+    $AddinName = [System.IO.Path]::GetFileName($AddinPath)
+
+    # Excel does not enumerate hidden add-in workbooks, but direct lookup still finds them.
+    try {
+      $Workbook = $Excel.Workbooks.Item($AddinName)
+      if ($Workbook) {
+        Write-Output "Closing open $AddinName..."
+        $Workbook.Close($false)
+        [System.Runtime.InteropServices.Marshal]::ReleaseComObject($Workbook) | Out-Null
+      }
+    } catch {
+      # The add-in may not be open in the active Excel instance.
+    }
 
     foreach ($Workbook in @($Excel.Workbooks)) {
       try {
